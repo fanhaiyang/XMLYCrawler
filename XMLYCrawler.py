@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 #from lxml import etree  #可实现xpath
 
 # 抓取喜马拉雅音频文件 网址：https://www.ximalaya.com/top/
@@ -28,13 +29,26 @@ class XiMa(object):
 
     # 保存音频文件
     def saveSource(self,sources):
+        #bookName =str(self.bookName).replace('"',' ')  # ??未起作用
+        path='F:\\Python练习\\喜马拉雅音频\\'+bookName
+        isExistd=os.path.exists(path)
+        # 判断文件夹是否存在
+        if not isExistd:
+            os.makedirs(path)
+
         for item in sources:
             print('开始抓取文件[' +item['name']+ ']...')
+            filePath = path+'\{}.m4a'.format('['+bookName+']'+item['name']) 
+            # 判断文件是否存在
+            if os.path.exists(filePath):
+                print("已存在！无需下载")
+                continue
+
             # 以二进制格式打开
-            file=open('F:\\Python练习\\喜马拉雅音频\{}.m4a'.format('['+self.bookName+']'+item['name']),'ab')
+            f=open(filePath,'ab')
             r=requests.get(item['src'],headers=self.headers)
-            file.write(r.content)
-            file.close()
+            f.write(r.content)
+            f.close()
             print('文件[' +item['name']+ ']抓取结束')
 
     # 执行方法
@@ -64,6 +78,7 @@ def getAllPDList():
 if __name__=='__main__':
     #xima=XiMa('吴晓波频道',15273276)
     #xima.runFun()
+
     allSources = getAllPDList()
     #print(allSources)
     for source in allSources:
